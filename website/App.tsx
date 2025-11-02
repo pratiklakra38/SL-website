@@ -2,7 +2,6 @@
 import React from 'react';
 import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
-import supabase from './server/supabaseClient';
 
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
