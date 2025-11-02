@@ -88,20 +88,19 @@ const CourseLearningPage: React.FC = () => {
     }
   }, [currentModule, id, currentModuleData.id]);
 
-  const handleProgress = (state: { playedSeconds: number }) => {
-    setPlayedSeconds(state.playedSeconds);
-    // Save playback position every 10 seconds
-    if (Math.floor(state.playedSeconds) % 10 === 0) {
-      localStorage.setItem(`course-${id}-module-${currentModuleData.id}`, state.playedSeconds.toString());
-    }
-    // Auto-complete if 90% watched
-    const videoDuration = playerRef.current?.getDuration() || 0;
-    if (videoDuration > 0 && state.playedSeconds / videoDuration >= 0.9 && !currentModuleData.completed) {
-      setIsCompleted(true);
-      // Auto-mark as complete
-      modules[currentModule].completed = true;
-    }
-  };
+  const handleProgress = (state: any) => {
+  const seconds = state.playedSeconds
+  setPlayedSeconds(seconds)
+  if (Math.floor(seconds) % 10 === 0) {
+    localStorage.setItem(`course-${id}-module-${currentModuleData.id}`, seconds.toString())
+  }
+  const duration = playerRef.current?.getDuration() || 0
+  if (duration > 0 && seconds / duration >= 0.9 && !currentModuleData.completed) {
+    setIsCompleted(true)
+    modules[currentModule].completed = true
+  }
+}
+
 
   const handleComplete = () => {
     modules[currentModule].completed = true;
@@ -135,26 +134,27 @@ const CourseLearningPage: React.FC = () => {
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 mb-6">
           {/* Video Player */}
           <div className="relative bg-black rounded-lg overflow-hidden mb-6" style={{ paddingTop: '56.25%' }}>
-            <ReactPlayer
-              ref={playerRef}
-              url={currentModuleData.videoUrl}
-              width="100%"
-              height="100%"
-              style={{ position: 'absolute', top: 0, left: 0 }}
-              controls
-              playbackRate={playbackRate}
-              onProgress={handleProgress}
-              light={currentModuleData.thumbnail || false}
-              config={{
-                youtube: {
-                  playerVars: {
-                    controls: 1,
-                    modestbranding: 1,
-                  } as any,
-                },
-              }}
-            />
-          </div>
+      <ReactPlayer
+        ref={playerRef}
+        url={currentModuleData.videoUrl}
+        width="100%"
+        height="100%"
+        style={{ position: 'absolute', top: 0, left: 0 }}
+        controls
+        playbackRate={playbackRate}
+        onProgress={handleProgress}
+        light={currentModuleData.thumbnail || false}
+        // 👇👇👇 FINAL FIX IS HERE 👇👇👇
+        config={{
+          youtube: {
+            playerVars: {
+              controls: 1,
+              modestbranding: 1,
+            },
+          },
+        } as any} // <- Assert the ENTIRE config object as 'any'
+      />
+    </div>
 
           {/* Video Controls */}
           <div className="flex items-center gap-4 mb-6 flex-wrap">
