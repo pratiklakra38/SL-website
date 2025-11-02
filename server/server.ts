@@ -7,10 +7,13 @@ dotenv.config()
 const app = express()
 app.use(express.json())
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ADMIN_KEY!
-)
+const PORT = 5000
+const SUPABASE_URL = process.env.SUPABASE_URL!
+const SUPABASE_KEY = process.env.SUPABASE_ADMIN_KEY!
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+
+
 
 app.get("/", (req, res) => {
   res.send("Server running ✅")
@@ -22,5 +25,4 @@ app.get("/testsupabase", async (req, res) => {
   res.json({ data })
 })
 
-const PORT = process.env.PORT || 3000
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
