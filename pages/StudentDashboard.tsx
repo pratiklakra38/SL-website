@@ -1,14 +1,26 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from 'react-router-dom'
+
 
 const StudentDashboard: React.FC = () => {
   const [activeMenu, setActiveMenu] = useState('dashboard');
   const navigate = useNavigate();
 
-  // Mock data - replace with actual data from API
-  const userName = 'Ojas Verma';
-  const userEmail = 'ojasverma01@gmail.com';
-  const userImage = '/images/student.jpg';
+
+  const location = useLocation()
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user") || "null");
+    if (!user) {
+      navigate("/login");
+    }
+  }, [navigate]);
+
+  const savedUser = JSON.parse(localStorage.getItem('user') || '{}')
+  const fullName = savedUser.fullName
+  const email = savedUser.email
+  const userName = fullName || 'Student'
+  const userEmail = email || 'student@example.com'
+  const userImage = '/images/student.jpg'
 
   const mockCourses = [
     {
@@ -137,7 +149,10 @@ const StudentDashboard: React.FC = () => {
             Settings
           </button>
           <button
-            onClick={() => navigate('/')}
+            onClick={() => {
+              localStorage.removeItem("user")
+              navigate('/')
+            }}
             className="w-full text-left px-4 py-3 rounded-lg transition-colors flex items-center gap-3 text-gray-300 hover:bg-gray-800"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

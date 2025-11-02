@@ -8,15 +8,46 @@ const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // For now, redirect to dashboard based on user type
-    if (userType === 'student') {
-      navigate('/learn/dashboard');
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  try {
+    const response = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      console.log("Login success:", result);
+
+      const { full_name, email: userEmail, role } = result.data;
+
+      // Save user data to localStorage
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          fullName: full_name,
+          email: userEmail,
+          role,
+        })
+      );
+
+      navigate(
+        role === "student" ? "/learn/dashboard" : "/mentor/dashboard",
+        { state: { fullName: full_name, email: userEmail } }
+      );
     } else {
-      navigate('/mentor/dashboard');
+      alert(result.error || "Login failed");
     }
-  };
+  } catch (err) {
+    console.error(err);
+    alert("An error occurred while logging in");
+  }
+};
+
 
   const handleGoogleAuth = () => {
     // Google auth placeholder

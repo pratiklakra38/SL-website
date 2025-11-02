@@ -14,23 +14,57 @@ const SignupPage: React.FC = () => {
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match');
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  if (formData.password !== formData.confirmPassword) {
+    alert("Passwords do not match");
+    return;
+  }
+
+  if (!agreeToTerms) {
+    alert("Please agree to the Terms of Service");
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/auth/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: formData.email,
+        password: formData.password,
+        fullName: formData.fullName,
+        role: userType === "student" ? "student" : "mentor",
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.error || "Signup failed");
       return;
     }
-    if (!agreeToTerms) {
-      alert('Please agree to the Terms of Service');
-      return;
-    }
-    // For now, redirect to dashboard based on user type
-    if (userType === 'student') {
-      navigate('/learn/dashboard');
-    } else {
-      navigate('/mentor/dashboard');
-    }
-  };
+
+    // Save user info locally
+    localStorage.setItem(
+      "user",
+      JSON.stringify({
+        fullName: formData.fullName,
+        email: formData.email,
+        role: userType === "student" ? "student" : "mentor",
+      })
+    );
+
+    alert("Signup successful!");
+    navigate(
+      userType === "student" ? "/learn/dashboard" : "/mentor/dashboard"
+    );
+  } catch (err) {
+    console.error(err);
+    alert("An error occurred. Please try again.");
+  }
+};
 
   const handleGoogleAuth = () => {
     // Google auth placeholder
