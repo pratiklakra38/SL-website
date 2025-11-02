@@ -1,6 +1,7 @@
 import path from "path";
 import { defineConfig, loadEnv, Plugin } from "vite";
 import react from "@vitejs/plugin-react";
+import restart from "vite-plugin-restart"
 
 // Custom plugin to attach Express server
 function expressPlugin(): Plugin {
@@ -8,7 +9,7 @@ function expressPlugin(): Plugin {
     name: "express-plugin",
     apply: "serve",
     async configureServer(server) {
-      const { createServer } = await import("./server/index.ts");
+      const { createServer } = await import("./server/server.ts");
       const app = createServer();
       server.middlewares.use(app);
     },
@@ -23,7 +24,11 @@ export default defineConfig(({ mode }) => {
       port: 3000,
       host: "0.0.0.0",
     },
-    plugins: [react(), expressPlugin()],
+    plugins: [
+      react(),
+      expressPlugin(),
+      restart({ restart: ["./server/**/*.{ts,js}"] })
+    ],
     define: {
       "process.env.API_KEY": JSON.stringify(env.GEMINI_API_KEY),
       "process.env.GEMINI_API_KEY": JSON.stringify(env.GEMINI_API_KEY),
