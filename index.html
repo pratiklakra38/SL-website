@@ -1,0 +1,57 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ajay Gauranga Das - Kirtan Rhythms</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'brand-dark': '#0a0a0a',
+              'brand-dark-secondary': '#1a1a1a',
+              'brand-gold': '#FFB84D',
+              'brand-maroon': '#8B0000',
+              'brand-orange': '#FF6B35',
+              'cream': '#FAF8F3',
+              'cream-light': '#FEFBF5',
+              'brown-dark': '#3D2817',
+              'brown': '#5C3D2E',
+              'orange-warm': '#FF8C42',
+            },
+            fontFamily: {
+              sans: ['Inter', 'system-ui', 'sans-serif'],
+              heading: ['Poppins', 'Inter', 'sans-serif'],
+            },
+            backgroundImage: {
+              'devotional-pattern': "url('https://www.transparenttextures.com/patterns/asanoha-400px.png')",
+              'gradient-dark': 'linear-gradient(180deg, #0a0a0a, #1a1a1a)',
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@700;800&display=swap" rel="stylesheet">
+  <script type="importmap">
+{
+  "imports": {
+    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.5",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
