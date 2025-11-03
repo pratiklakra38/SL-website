@@ -1,53 +1,33 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
 import { Link } from 'react-router-dom';
 
 const MentorDashboard: React.FC = () => {
-  // Mock data - replace with API call
+  const [courses, setCourses] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const stats = {
     totalCourses: 8,
     totalStudents: 1243,
   };
+  const myCourses = [];
+  const recentActivity = [];
 
-  const myCourses = [
-    {
-      id: 1,
-      title: 'Mridanga Traditional Gaudiya Style – Level 1',
-      thumbnail: 'https://picsum.photos/seed/mridanga1/200/150',
-      students: 456,
-      status: 'Published',
-      statusColor: 'bg-green-900 text-green-300 border border-green-700',
-    },
-    {
-      id: 2,
-      title: 'Kartal Level 1 – Hand Techniques',
-      thumbnail: 'https://picsum.photos/seed/kartal1/200/150',
-      students: 234,
-      status: 'Published',
-      statusColor: 'bg-green-900 text-green-300 border border-green-700',
-    },
-    {
-      id: 3,
-      title: 'Advanced Mridanga Techniques',
-      thumbnail: 'https://picsum.photos/seed/advanced/200/150',
-      students: 89,
-      status: 'Pending Approval',
-      statusColor: 'bg-yellow-900 text-yellow-300 border border-yellow-700',
-    },
-    {
-      id: 4,
-      title: 'Kirtan Masterclass',
-      thumbnail: 'https://picsum.photos/seed/masterclass/200/150',
-      students: 0,
-      status: 'Draft',
-      statusColor: 'bg-gray-700 text-gray-300 border border-gray-600',
-    },
-  ];
+  useEffect(() => {
+    const fetchCourses = async () => {
+      const res = await fetch("http://localhost:3000/api/courses/courses");
+      const data = await res.json();
+      setCourses(data.courses || []);
+      setLoading(false);
+    };
+    fetchCourses();
+  }, []);
 
-  const recentActivity = [
-    { type: 'enrollment', message: 'Madhav Krishna Das enrolled in Mridanga Level 1', time: '2 hours ago' },
-    { type: 'quiz', message: '5 students completed Module 2 quiz', time: '4 hours ago' },
-    { type: 'review', message: 'New 5-star review for Kartal Level 1', time: '1 day ago' },
-  ];
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-screen text-white text-xl">
+        Loading courses...
+      </div>
+    );
 
   return (
     <div className="min-h-screen bg-gradient-dark">
@@ -114,11 +94,11 @@ const MentorDashboard: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {myCourses.map((course) => (
+                    {courses.map((course) => (
                       <tr key={course.id} className="border-b border-gray-700 hover:bg-gray-800 transition-colors">
                         <td className="py-4">
                           <img
-                            src={course.thumbnail}
+                            src={course.thumbnail_url}
                             alt={course.title}
                             className="w-16 h-12 object-cover rounded"
                           />
@@ -126,10 +106,10 @@ const MentorDashboard: React.FC = () => {
                         <td className="py-4">
                           <p className="font-semibold text-white">{course.title}</p>
                         </td>
-                        <td className="py-4 text-gray-400">{course.students}</td>
+                        <td className="py-4 text-gray-400">0</td>
                         <td className="py-4">
-                          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${course.statusColor}`}>
-                            {course.status}
+                          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-900 text-green-300 border border-green-700">
+                            Published
                           </span>
                         </td>
                         <td className="py-4">

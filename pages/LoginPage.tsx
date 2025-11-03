@@ -23,9 +23,10 @@ const LoginPage: React.FC = () => {
     if (response.ok) {
       console.log("Login success:", result);
 
-      const { full_name, email: userEmail, role } = result.data;
+      const { id, full_name, email: userEmail, role } = result.data;
 
       // Save user data to localStorage
+      localStorage.setItem("userId", id);
       localStorage.setItem(
         "user",
         JSON.stringify({

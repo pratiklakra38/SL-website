@@ -6,45 +6,57 @@ const CreateCoursePage: React.FC = () => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     title: '',
-    slug: '',
     description: '',
     category: '',
     level: '',
     thumbnail: null as File | null,
   });
 
-  const generateSlug = (title: string) => {
-    return title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '');
-  };
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const title = e.target.value;
-    setFormData({
-      ...formData,
-      title,
-      slug: generateSlug(title),
-    });
-  };
+  if (step < 3) {
+    setStep(step + 1);
+    return;
+  }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (step < 3) {
-      setStep(step + 1);
-    } else {
-      // Submit course
-      console.log('Submitting course:', formData);
-      // Navigate to modules page
-      navigate('/mentor/course/1/modules');
-    }
-  };
+  if (!formData.thumbnail) {
+    alert("Please upload a thumbnail");
+    return;
+  }
+
+  const instructorId = localStorage.getItem("userId");
+
+  const form = new FormData();
+  form.append("title", formData.title);
+  form.append("description", formData.description);
+  form.append("category", formData.category);
+  form.append("level", formData.level);
+  form.append("thumbnail", formData.thumbnail as Blob);
+  form.append("instructorId", instructorId || "");
+
+
+  try {
+    const res = await fetch("http://localhost:3000/api/courses/create", {
+      method: "POST",
+      body: form,
+      duplex: "half",
+    } as any);
+
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.error || "Failed to create course");
+
+    navigate(`/mentor/course/${data.course.id}/modules`);
+  } catch (err) {
+    console.error(err);
+    alert("Error creating course");
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-dark">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
-        {/* Header */}
         <div className="mb-8">
           <Link
             to="/mentor/dashboard"
@@ -58,7 +70,6 @@ const CreateCoursePage: React.FC = () => {
           <h1 className="text-4xl font-bold text-white font-heading">Create New Course</h1>
         </div>
 
-        {/* Progress Steps */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
             {[1, 2, 3].map((s) => (
@@ -95,7 +106,6 @@ const CreateCoursePage: React.FC = () => {
           </div>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="bg-gray-900 border border-gray-800 rounded-xl p-8">
           {step === 1 && (
             <div className="space-y-6">
@@ -106,24 +116,11 @@ const CreateCoursePage: React.FC = () => {
                 <input
                   type="text"
                   value={formData.title}
-                  onChange={handleTitleChange}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   placeholder="e.g., Mridanga Traditional Gaudiya Style – Level 1"
                   className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-orange"
                   required
                 />
-              </div>
-
-              <div>
-                <label className="block text-gray-300 font-semibold mb-2">Slug *</label>
-                <input
-                  type="text"
-                  value={formData.slug}
-                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                  placeholder="mridanga-level-1"
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-orange"
-                  required
-                />
-                <p className="text-sm text-gray-400 mt-1">URL-friendly identifier (auto-generated from title)</p>
               </div>
 
               <div>
@@ -215,10 +212,6 @@ const CreateCoursePage: React.FC = () => {
                   <p className="text-gray-300">{formData.title}</p>
                 </div>
                 <div>
-                  <span className="font-semibold text-white">Slug:</span>
-                  <p className="text-gray-300">{formData.slug}</p>
-                </div>
-                <div>
                   <span className="font-semibold text-white">Category:</span>
                   <p className="text-gray-300">{formData.category}</p>
                 </div>
@@ -234,7 +227,6 @@ const CreateCoursePage: React.FC = () => {
             </div>
           )}
 
-          {/* Form Actions */}
           <div className="flex justify-between mt-8 pt-6 border-t border-gray-700">
             <button
               type="button"
@@ -272,4 +264,3 @@ const CreateCoursePage: React.FC = () => {
 };
 
 export default CreateCoursePage;
-
