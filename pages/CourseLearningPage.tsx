@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import ReactPlayer from 'react-player';
 
+
 interface Module {
   id: number;
   title: string;
@@ -23,7 +24,13 @@ const CourseLearningPage: React.FC = () => {
   const [playedSeconds, setPlayedSeconds] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1);
+  const [selectedVideoUrl, setSelectedVideoUrl] = useState("");
   const playerRef = useRef<any>(null);
+
+  useEffect(() => {
+    setSelectedVideoUrl(modules[0].videoUrl);
+  }, []);
+
 
   // Mock modules data - replace with API call
   const modules: Module[] = [
@@ -75,6 +82,9 @@ const CourseLearningPage: React.FC = () => {
   ];
 
   const currentModuleData = modules[currentModule];
+  useEffect(() => {
+    setSelectedVideoUrl(currentModuleData.videoUrl);
+  }, [currentModule]);
   const courseProgress = Math.round((modules.filter(m => m.completed).length / modules.length) * 100);
 
   useEffect(() => {
@@ -89,17 +99,17 @@ const CourseLearningPage: React.FC = () => {
   }, [currentModule, id, currentModuleData.id]);
 
   const handleProgress = (state: any) => {
-  const seconds = state.playedSeconds
-  setPlayedSeconds(seconds)
-  if (Math.floor(seconds) % 10 === 0) {
-    localStorage.setItem(`course-${id}-module-${currentModuleData.id}`, seconds.toString())
+    const seconds = state.playedSeconds
+    setPlayedSeconds(seconds)
+    if (Math.floor(seconds) % 10 === 0) {
+      localStorage.setItem(`course-${id}-module-${currentModuleData.id}`, seconds.toString())
+    }
+    const duration = playerRef.current?.getDuration() || 0
+    if (duration > 0 && seconds / duration >= 0.9 && !currentModuleData.completed) {
+      setIsCompleted(true)
+      modules[currentModule].completed = true
+    }
   }
-  const duration = playerRef.current?.getDuration() || 0
-  if (duration > 0 && seconds / duration >= 0.9 && !currentModuleData.completed) {
-    setIsCompleted(true)
-    modules[currentModule].completed = true
-  }
-}
 
 
   const handleComplete = () => {
@@ -127,34 +137,46 @@ const CourseLearningPage: React.FC = () => {
     }
   };
 
+  const getYouTubeEmbedUrl = (url) => {
+    if (!url) return null;
+    try {
+      const urlObj = new URL(url);
+      const videoId = urlObj.searchParams.get("v");
+      if (videoId) return `https://www.youtube.com/embed/${videoId}?rel=0`;
+      if (urlObj.hostname === "youtu.be") {
+        const path = urlObj.pathname.substring(1);
+        return `https://www.youtube.com/embed/${path}?rel=0`;
+      }
+    } catch {
+      return url;
+    }
+    return url;
+  };
+
+  const embedUrl = getYouTubeEmbedUrl(selectedVideoUrl);
+
   return (
     <div className="min-h-screen bg-gradient-dark flex">
       {/* Left Panel - Video Player */}
       <div className="flex-1 p-6">
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 mb-6">
           {/* Video Player */}
-          <div className="relative bg-black rounded-lg overflow-hidden mb-6" style={{ paddingTop: '56.25%' }}>
-      <ReactPlayer
-        ref={playerRef}
-        url={currentModuleData.videoUrl}
-        width="100%"
-        height="100%"
-        style={{ position: 'absolute', top: 0, left: 0 }}
-        controls
-        playbackRate={playbackRate}
-        onProgress={handleProgress}
-        light={currentModuleData.thumbnail || false}
-        // 👇👇👇 FINAL FIX IS HERE 👇👇👇
-        config={{
-          youtube: {
-            playerVars: {
-              controls: 1,
-              modestbranding: 1,
-            },
-          },
-        } as any} // <- Assert the ENTIRE config object as 'any'
-      />
-    </div>
+          <div className="bg-black rounded-lg overflow-hidden mb-6">
+            {embedUrl && embedUrl.includes("embed") ? (
+              <iframe
+                src={embedUrl}
+                title="YouTube video player"
+                className="w-full h-[600px] rounded-lg"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              ></iframe>
+            ) : (
+              <div className="text-red-400 text-center py-20">
+                Invalid or missing video link.
+              </div>
+            )}
+          </div>
+
 
           {/* Video Controls */}
           <div className="flex items-center gap-4 mb-6 flex-wrap">
@@ -183,31 +205,28 @@ const CourseLearningPage: React.FC = () => {
           <div className="flex border-b border-gray-700 mb-4">
             <button
               onClick={() => setCurrentTab('overview')}
-              className={`px-4 py-2 font-semibold transition-colors ${
-                currentTab === 'overview'
-                  ? 'text-brand-orange border-b-2 border-brand-orange'
-                  : 'text-gray-400 hover:text-gray-300'
-              }`}
+              className={`px-4 py-2 font-semibold transition-colors ${currentTab === 'overview'
+                ? 'text-brand-orange border-b-2 border-brand-orange'
+                : 'text-gray-400 hover:text-gray-300'
+                }`}
             >
               Overview
             </button>
             <button
               onClick={() => setCurrentTab('resources')}
-              className={`px-4 py-2 font-semibold transition-colors ${
-                currentTab === 'resources'
-                  ? 'text-brand-orange border-b-2 border-brand-orange'
-                  : 'text-gray-400 hover:text-gray-300'
-              }`}
+              className={`px-4 py-2 font-semibold transition-colors ${currentTab === 'resources'
+                ? 'text-brand-orange border-b-2 border-brand-orange'
+                : 'text-gray-400 hover:text-gray-300'
+                }`}
             >
               Resources
             </button>
             <button
               onClick={() => setCurrentTab('discussion')}
-              className={`px-4 py-2 font-semibold transition-colors ${
-                currentTab === 'discussion'
-                  ? 'text-brand-orange border-b-2 border-brand-orange'
-                  : 'text-gray-400 hover:text-gray-300'
-              }`}
+              className={`px-4 py-2 font-semibold transition-colors ${currentTab === 'discussion'
+                ? 'text-brand-orange border-b-2 border-brand-orange'
+                : 'text-gray-400 hover:text-gray-300'
+                }`}
             >
               Discussion
             </button>
@@ -252,11 +271,10 @@ const CourseLearningPage: React.FC = () => {
             <button
               onClick={handlePreviousModule}
               disabled={currentModule === 0}
-              className={`px-6 py-2 rounded-lg font-semibold transition-opacity ${
-                currentModule === 0
-                  ? 'bg-gray-800 text-gray-500 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-brand-orange to-amber-500 text-white hover:opacity-90'
-              }`}
+              className={`px-6 py-2 rounded-lg font-semibold transition-opacity ${currentModule === 0
+                ? 'bg-gray-800 text-gray-500 cursor-not-allowed'
+                : 'bg-gradient-to-r from-brand-orange to-amber-500 text-white hover:opacity-90'
+                }`}
             >
               Previous Module
             </button>
@@ -277,11 +295,10 @@ const CourseLearningPage: React.FC = () => {
             <button
               onClick={handleNextModule}
               disabled={currentModule === modules.length - 1 || !modules[currentModule + 1]?.unlocked}
-              className={`px-6 py-2 rounded-lg font-semibold transition-opacity ${
-                currentModule === modules.length - 1 || !modules[currentModule + 1]?.unlocked
-                  ? 'bg-gray-800 text-gray-500 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-brand-orange to-amber-500 text-white hover:opacity-90'
-              }`}
+              className={`px-6 py-2 rounded-lg font-semibold transition-opacity ${currentModule === modules.length - 1 || !modules[currentModule + 1]?.unlocked
+                ? 'bg-gray-800 text-gray-500 cursor-not-allowed'
+                : 'bg-gradient-to-r from-brand-orange to-amber-500 text-white hover:opacity-90'
+                }`}
             >
               Next Module
             </button>
@@ -302,7 +319,7 @@ const CourseLearningPage: React.FC = () => {
         </Link>
 
         <h2 className="text-2xl font-bold text-white mb-2">Mridanga Level 1</h2>
-        
+
         <div className="mb-6">
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm text-gray-400">Course Progress</span>
@@ -328,13 +345,12 @@ const CourseLearningPage: React.FC = () => {
                   setIsCompleted(module.completed);
                 }
               }}
-              className={`w-full text-left p-4 rounded-lg transition-all ${
-                idx === currentModule
-                  ? 'bg-gradient-to-r from-brand-orange to-amber-500 text-white'
-                  : module.unlocked
+              className={`w-full text-left p-4 rounded-lg transition-all ${idx === currentModule
+                ? 'bg-gradient-to-r from-brand-orange to-amber-500 text-white'
+                : module.unlocked
                   ? 'bg-gray-800 hover:bg-gray-700 text-white border border-gray-700'
                   : 'bg-gray-800 text-gray-500 cursor-not-allowed border border-gray-700'
-              }`}
+                }`}
             >
               <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center gap-2">

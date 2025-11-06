@@ -4,6 +4,8 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 
 const StudentDashboard: React.FC = () => {
   const [activeMenu, setActiveMenu] = useState('dashboard');
+  const [courses, setCourses] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
 
@@ -15,6 +17,16 @@ const StudentDashboard: React.FC = () => {
     }
   }, [navigate]);
 
+  useEffect(() => {
+    const fetchCourses = async () => {
+      const res = await fetch("http://localhost:3000/api/courses/courses");
+      const data = await res.json();
+      setCourses(data.courses || []);
+      setLoading(false);
+    };
+    fetchCourses();
+  }, []);
+
   const savedUser = JSON.parse(localStorage.getItem('user') || '{}')
   const fullName = savedUser.fullName
   const email = savedUser.email
@@ -22,22 +34,12 @@ const StudentDashboard: React.FC = () => {
   const userEmail = email || 'student@example.com'
   const userImage = '/images/student.jpg'
 
-  const mockCourses = [
-    {
-      id: 1,
-      title: 'Mridanga Traditional Gaudiya Style – Level 1',
-      thumbnail: '/images/mrindanga lesson-1 .jpg',
-      progress: 65,
-      lastViewed: 'Module 5: Advanced Strokes',
-    },
-    {
-      id: 2,
-      title: 'Kartal Level 1 – Hand Techniques',
-      thumbnail: 'images/kartal-lesson-1.jpg',
-      progress: 40,
-      lastViewed: 'Module 3: Basic Patterns',
-    },
-  ];
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-screen text-white text-xl">
+        Loading courses...
+      </div>
+    );
 
   const recommendedCourses = [
     {
@@ -71,11 +73,10 @@ const StudentDashboard: React.FC = () => {
         <nav className="space-y-2">
           <button
             onClick={() => setActiveMenu('dashboard')}
-            className={`w-full text-left px-4 py-3 rounded-lg transition-colors flex items-center gap-3 ${
-              activeMenu === 'dashboard'
-                ? 'bg-gradient-to-r from-brand-orange to-amber-500 text-white'
-                : 'text-gray-300 hover:bg-gray-800'
-            }`}
+            className={`w-full text-left px-4 py-3 rounded-lg transition-colors flex items-center gap-3 ${activeMenu === 'dashboard'
+              ? 'bg-gradient-to-r from-brand-orange to-amber-500 text-white'
+              : 'text-gray-300 hover:bg-gray-800'
+              }`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -84,11 +85,10 @@ const StudentDashboard: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveMenu('my-courses')}
-            className={`w-full text-left px-4 py-3 rounded-lg transition-colors flex items-center gap-3 ${
-              activeMenu === 'my-courses'
-                ? 'bg-gradient-to-r from-brand-orange to-amber-500 text-white'
-                : 'text-gray-300 hover:bg-gray-800'
-            }`}
+            className={`w-full text-left px-4 py-3 rounded-lg transition-colors flex items-center gap-3 ${activeMenu === 'my-courses'
+              ? 'bg-gradient-to-r from-brand-orange to-amber-500 text-white'
+              : 'text-gray-300 hover:bg-gray-800'
+              }`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -97,11 +97,10 @@ const StudentDashboard: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveMenu('browse')}
-            className={`w-full text-left px-4 py-3 rounded-lg transition-colors flex items-center gap-3 ${
-              activeMenu === 'browse'
-                ? 'bg-gradient-to-r from-brand-orange to-amber-500 text-white'
-                : 'text-gray-300 hover:bg-gray-800'
-            }`}
+            className={`w-full text-left px-4 py-3 rounded-lg transition-colors flex items-center gap-3 ${activeMenu === 'browse'
+              ? 'bg-gradient-to-r from-brand-orange to-amber-500 text-white'
+              : 'text-gray-300 hover:bg-gray-800'
+              }`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -110,11 +109,10 @@ const StudentDashboard: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveMenu('progress')}
-            className={`w-full text-left px-4 py-3 rounded-lg transition-colors flex items-center gap-3 ${
-              activeMenu === 'progress'
-                ? 'bg-gradient-to-r from-brand-orange to-amber-500 text-white'
-                : 'text-gray-300 hover:bg-gray-800'
-            }`}
+            className={`w-full text-left px-4 py-3 rounded-lg transition-colors flex items-center gap-3 ${activeMenu === 'progress'
+              ? 'bg-gradient-to-r from-brand-orange to-amber-500 text-white'
+              : 'text-gray-300 hover:bg-gray-800'
+              }`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -123,11 +121,10 @@ const StudentDashboard: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveMenu('certificates')}
-            className={`w-full text-left px-4 py-3 rounded-lg transition-colors flex items-center gap-3 ${
-              activeMenu === 'certificates'
-                ? 'bg-gradient-to-r from-brand-orange to-amber-500 text-white'
-                : 'text-gray-300 hover:bg-gray-800'
-            }`}
+            className={`w-full text-left px-4 py-3 rounded-lg transition-colors flex items-center gap-3 ${activeMenu === 'certificates'
+              ? 'bg-gradient-to-r from-brand-orange to-amber-500 text-white'
+              : 'text-gray-300 hover:bg-gray-800'
+              }`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
@@ -136,11 +133,10 @@ const StudentDashboard: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveMenu('settings')}
-            className={`w-full text-left px-4 py-3 rounded-lg transition-colors flex items-center gap-3 ${
-              activeMenu === 'settings'
-                ? 'bg-gradient-to-r from-brand-orange to-amber-500 text-white'
-                : 'text-gray-300 hover:bg-gray-800'
-            }`}
+            className={`w-full text-left px-4 py-3 rounded-lg transition-colors flex items-center gap-3 ${activeMenu === 'settings'
+              ? 'bg-gradient-to-r from-brand-orange to-amber-500 text-white'
+              : 'text-gray-300 hover:bg-gray-800'
+              }`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -151,6 +147,7 @@ const StudentDashboard: React.FC = () => {
           <button
             onClick={() => {
               localStorage.removeItem("user")
+              localStorage.removeItem("userId")
               navigate('/')
             }}
             className="w-full text-left px-4 py-3 rounded-lg transition-colors flex items-center gap-3 text-gray-300 hover:bg-gray-800"
@@ -175,31 +172,31 @@ const StudentDashboard: React.FC = () => {
           {/* Continue Learning */}
           <section className="mb-12">
             <h2 className="text-2xl font-bold text-white mb-6">Continue Learning</h2>
-            {mockCourses.length > 0 && (
+            {courses.length > 0 && (
               <div className="bg-gray-900 rounded-xl p-6 border border-gray-800">
                 <div className="flex flex-col md:flex-row gap-6">
                   <img
-                    src={mockCourses[0].thumbnail}
-                    alt={mockCourses[0].title}
+                    src={courses[0].thumbnail}
+                    alt={courses[0].title}
                     className="w-full md:w-64 h-40 object-cover rounded-lg"
                   />
                   <div className="flex-1">
-                    <h3 className="text-xl font-bold text-white mb-2">{mockCourses[0].title}</h3>
-                    <p className="text-gray-400 mb-4">{mockCourses[0].lastViewed}</p>
+                    <h3 className="text-xl font-bold text-white mb-2">{courses[0].title}</h3>
+                    <p className="text-gray-400 mb-4">{courses[0].lastViewed}</p>
                     <div className="mb-4">
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-sm text-gray-400">Progress</span>
-                        <span className="text-sm font-semibold text-white">{mockCourses[0].progress}%</span>
+                        <span className="text-sm font-semibold text-white">{courses[0].progress}%</span>
                       </div>
                       <div className="w-full bg-gray-800 rounded-full h-2">
                         <div
                           className="bg-gradient-to-r from-brand-orange to-amber-500 h-2 rounded-full transition-all"
-                          style={{ width: `${mockCourses[0].progress}%` }}
+                          style={{ width: `${courses[0].progress}%` }}
                         ></div>
                       </div>
                     </div>
                     <Link
-                      to={`/learn/course/${mockCourses[0].id}`}
+                      to={`/learn/course/${courses[0].id}`}
                       className="inline-block bg-gradient-to-r from-brand-orange to-amber-500 text-white font-bold py-2 px-6 rounded-lg hover:opacity-90 transition-opacity"
                     >
                       Resume
@@ -213,42 +210,38 @@ const StudentDashboard: React.FC = () => {
           {/* My Courses */}
           <section className="mb-12">
             <h2 className="text-2xl font-bold text-white mb-6">My Courses</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {mockCourses.map((course) => (
-                <div
-                  key={course.id}
-                  className="bg-gray-900 rounded-xl overflow-hidden border border-gray-800 hover:shadow-lg transition-shadow"
-                >
-                  <img
-                    src={course.thumbnail}
-                    alt={course.title}
-                    className="w-full h-40 object-cover"
-                  />
-                  <div className="p-5">
-                    <h3 className="text-lg font-bold text-white mb-2">{course.title}</h3>
-                    <div className="mb-4">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm text-gray-400">Progress</span>
-                        <span className="text-sm font-semibold text-white">{course.progress}%</span>
-                      </div>
-                      <div className="w-full bg-gray-800 rounded-full h-2">
-                        <div
-                          className="bg-gradient-to-r from-brand-orange to-amber-500 h-2 rounded-full transition-all"
-                          style={{ width: `${course.progress}%` }}
-                        ></div>
-                      </div>
+            {courses.length === 0 ? (
+              <p className="text-gray-400">No courses enrolled yet.</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {courses.map((course) => (
+                  <div
+                    key={course.id}
+                    className="bg-gray-900 rounded-xl overflow-hidden border border-gray-800 hover:shadow-lg transition-shadow"
+                  >
+                    <img
+                      src={course.thumbnail_url}
+                      alt={course.title}
+                      className="w-full h-40 object-cover"
+                    />
+                    <div className="p-5">
+                      <h3 className="text-lg font-bold text-white mb-2">{course.title}</h3>
+                      <p className="text-sm text-gray-400 mb-4">
+                        {course.description || "No description available"}
+                      </p>
+                      <Link
+                        to={`/learn/course/${course.id}`}
+                        className="block w-full text-center bg-gradient-to-r from-brand-orange to-amber-500 text-white font-bold py-2 px-4 rounded-lg hover:opacity-90 transition-opacity"
+                      >
+                        Start Learning
+                      </Link>
                     </div>
-                    <Link
-                      to={`/learn/course/${course.id}`}
-                      className="block w-full text-center bg-gradient-to-r from-brand-orange to-amber-500 text-white font-bold py-2 px-4 rounded-lg hover:opacity-90 transition-opacity"
-                    >
-                      Continue
-                    </Link>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </section>
+
 
           {/* Recommended Courses */}
           <section>
