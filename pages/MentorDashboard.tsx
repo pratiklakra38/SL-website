@@ -38,12 +38,15 @@ const MentorDashboard: React.FC = () => {
             <h1 className="text-4xl font-bold text-white font-heading mb-2">Mentor Dashboard</h1>
             <p className="text-gray-400">Manage your courses and track student progress</p>
           </div>
-          <Link
-            to="/mentor/course/create"
-            className="bg-gradient-to-r from-brand-orange to-amber-500 text-white font-bold py-3 px-6 rounded-lg hover:opacity-90 transition-opacity"
-          >
-            Create New Course
-          </Link>
+          <button
+            onClick={() => {
+              localStorage.removeItem("user");
+              localStorage.removeItem("userId");
+              window.location.href = "/";
+            }}
+            className="bg-gradient-to-r from-red-600 to-red-600 text-white font-bold py-3 px-6 rounded-lg hover:opacity-90 transition-opacity mr-4 mb-2"
+          >Logout
+          </button>
         </div>
 
         {/* Stats Cards */}
