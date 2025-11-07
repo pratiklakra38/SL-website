@@ -47,7 +47,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
     if (!res.ok) throw new Error(data.error || "Failed to create course");
 
-    navigate(`/mentor/course/${data.course.id}/modules`);
+    navigate(`/mentor/dashboard`);
   } catch (err) {
     console.error(err);
     alert("Error creating course");
